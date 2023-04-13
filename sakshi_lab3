@@ -1,0 +1,85 @@
+bmscecse@bmscecse-HP-Elite-Tower-600-G9-Desktop-PC:~$ cqlsh
+Connected to Test Cluster at 127.0.0.1:9042
+[cqlsh 6.0.0 | Cassandra 4.0.5 | CQL spec 3.4.5 | Native protocol v5]
+Use HELP for help.
+cqlsh> CREATE KEYSPACE Employee1 WITH REPLICATION={'class':'SimpleStrategy','replication_factor':1};
+cqlsh> describe keyspaces;
+
+employee1  students  system_auth         system_schema  system_views         
+employees  system    system_distributed  system_traces  system_virtual_schema
+
+cqlsh> use Employee1;
+cqlsh:employee1> describe tables;
+cqlsh:employee1> use employees
+             ... 
+             ... use employees;
+Improper use command.
+cqlsh:employee1> use employees;
+cqlsh:employees> describe tables;
+
+employee_info
+
+cqlsh:employees> select * from employee_info;
+
+ emp_id | date_of_joining                 | dept_name | designation | emp_name | salary
+--------+---------------------------------+-----------+-------------+----------+--------
+      1 | 2022-12-22 18:30:00.000000+0000 |     sales |          HR |   sakshi |  20000
+
+(1 rows)
+cqlsh:employees> BEGIN BATCH
+             ... BEGIN BATCH INSERT INTO employee_info ( Emp_id, Emp_name, Date_Of_Joining, Designation,Salary,Dept_name) VALUES (2,'vijaya','2022-12-21','HR',30000,'sales'); 
+             ... APPLY BATCH;
+SyntaxException: line 2:0 mismatched input 'BEGIN' expecting K_APPLY (BEGIN BATCH[BEGIN]...)
+cqlsh:employees> BEGIN BATCH
+             ...  INSERT INTO employee_info ( Emp_id, Emp_name, Date_Of_Joining, Designation,Salary,Dept_name)
+             ... VALUES (2,'vijaya','2022-12-21','manager',30000,'software')
+             ...  INSERT INTO employee_info ( Emp_id, Emp_name, Date_Of_Joining, Designation,Salary,Dept_name)
+             ... VALUES (3,'nevya','2022-12-17','design',25000,'software')
+             ... APPLY BATCH;
+cqlsh:employees> select * from employee_info;
+
+ emp_id | date_of_joining                 | dept_name | designation | emp_name | salary
+--------+---------------------------------+-----------+-------------+----------+--------
+      1 | 2022-12-22 18:30:00.000000+0000 |     sales |          HR |   sakshi |  20000
+      2 | 2022-12-20 18:30:00.000000+0000 |  software |     manager |   vijaya |  30000
+      3 | 2022-12-16 18:30:00.000000+0000 |  software |      design |    nevya |  25000
+
+(3 rows)
+cqlsh:employees> select * from employee_info order by salary ASC;
+InvalidRequest: Error from server: code=2200 [Invalid query] message="ORDER BY is only supported when the partition key is restricted by an EQ or an IN."
+cqlsh:employees> alter table employee_info add project text;
+cqlsh:employees> update employee_info set project='Samsung' where emp_id=1;
+cqlsh:employees> select * from employee_info;
+
+ emp_id | date_of_joining                 | dept_name | designation | emp_name | project | salary
+--------+---------------------------------+-----------+-------------+----------+---------+--------
+      1 | 2022-12-22 18:30:00.000000+0000 |     sales |          HR |   sakshi | Samsung |  20000
+      2 | 2022-12-20 18:30:00.000000+0000 |  software |     manager |   vijaya |    null |  30000
+      3 | 2022-12-16 18:30:00.000000+0000 |  software |      design |    nevya |    null |  25000
+
+(3 rows)
+cqlsh:employees> INSERT INTO employee_info ( Emp_id, Emp_name, Date_Of_Joining, Designation,Salary,Dept_name) VALUES (4,'vishnu','2022-12-11','HR',35000,'manager')using TTL 15;  
+cqlsh:employees> select TTL(emp_name) from employee_info;
+
+ ttl(emp_name)
+---------------
+          null
+          null
+          null
+
+(3 rows)
+cqlsh:employees> INSERT INTO employee_info ( Emp_id, Emp_name, Date_Of_Joining, Designation,Salary,Dept_name) VALUES (4,'vishnu','2022-12-11','HR',35000,'manager')using TTL 15;  
+cqlsh:employees> select TTL(emp_name) from employee_info;
+
+ ttl(emp_name)
+---------------
+          null
+          null
+            10
+          null
+
+(4 rows)
+cqlsh:employees> 
+cqlsh:employees> 
+
+
