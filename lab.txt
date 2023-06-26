@@ -1,0 +1,237 @@
+ash: ${debian_chroot :-}: bad substitution
+bmsce@bmsce-OptiPlex-3060:~$ spark-shell
+23/06/08 11:38:20 WARN Utils: Your hostname, bmsce-OptiPlex-3060 resolves to a loopback address: 127.0.1.1; using 10.124.7.99 instead (on interface enp1s0)
+23/06/08 11:38:20 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+23/06/08 11:38:21 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Spark context Web UI available at http://10.124.7.99:4040
+Spark context available as 'sc' (master = local[*], app id = local-1686204506922).
+Spark session available as 'spark'.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /___/ .__/\_,_/_/ /_/\_\   version 2.4.8
+      /_/
+         
+Using Scala version 2.11.12 (OpenJDK 64-Bit Server VM, Java 1.8.0_362)
+Type in expressions to have them evaluated.
+Type :help for more information.
+
+scala> quit
+<console>:24: error: not found: value quit
+       quit
+       ^
+
+scala> Quit
+<console>:24: error: not found: value Quit
+       Quit
+       ^
+
+scala> :quit
+bmsce@bmsce-OptiPlex-3060:~$ cat >file1.txt
+sakshi
+nevya 
+vijaya^C
+bmsce@bmsce-OptiPlex-3060:~$ spark-shell
+23/06/08 11:41:06 WARN Utils: Your hostname, bmsce-OptiPlex-3060 resolves to a loopback address: 127.0.1.1; using 10.124.7.99 instead (on interface enp1s0)
+23/06/08 11:41:06 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+23/06/08 11:41:06 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Spark context Web UI available at http://10.124.7.99:4040
+Spark context available as 'sc' (master = local[*], app id = local-1686204669932).
+Spark session available as 'spark'.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /___/ .__/\_,_/_/ /_/\_\   version 2.4.8
+      /_/
+         
+Using Scala version 2.11.12 (OpenJDK 64-Bit Server VM, Java 1.8.0_362)
+Type in expressions to have them evaluated.
+Type :help for more information.
+
+scala> val data=sc.textfile("file1.txt")
+<console>:24: error: value textfile is not a member of org.apache.spark.SparkContext
+       val data=sc.textfile("file1.txt")
+                   ^
+
+scala> val data=sc.textFile("file1.txt")
+data: org.apache.spark.rdd.RDD[String] = file1.txt MapPartitionsRDD[1] at textFile at <console>:24
+
+scala> data.collect;
+res0: Array[String] = Array(sakshi, "nevya ")
+
+scala> val splitdata=data.flatMap(line=>line.split(" "));
+splitdata: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[2] at flatMap at <console>:25
+
+scala> splitdata.collect;
+res1: Array[String] = Array(sakshi, nevya)
+
+scala> :quit
+bmsce@bmsce-OptiPlex-3060:~$ cat >file1.txt
+hello how are you
+sakshi nevya vijaya
+^C
+bmsce@bmsce-OptiPlex-3060:~$ spark-shell
+23/06/08 11:54:42 WARN Utils: Your hostname, bmsce-OptiPlex-3060 resolves to a loopback address: 127.0.1.1; using 10.124.7.99 instead (on interface enp1s0)
+23/06/08 11:54:42 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+23/06/08 11:54:42 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Spark context Web UI available at http://10.124.7.99:4040
+Spark context available as 'sc' (master = local[*], app id = local-1686205485398).
+Spark session available as 'spark'.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /___/ .__/\_,_/_/ /_/\_\   version 2.4.8
+      /_/
+         
+Using Scala version 2.11.12 (OpenJDK 64-Bit Server VM, Java 1.8.0_362)
+Type in expressions to have them evaluated.
+Type :help for more information.
+
+scala> val data=sc.textFile("file1.txt")
+data: org.apache.spark.rdd.RDD[String] = file1.txt MapPartitionsRDD[1] at textFile at <console>:24
+
+scala> data.collect;
+res0: Array[String] = Array(hello how are you, sakshi nevya vijaya)
+
+scala> val splitdata=data.flatMap(line=>line.split(" "));
+splitdata: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[2] at flatMap at <console>:25
+
+scala> val mapdata=splitdata.map(word=>(word,1));
+mapdata: org.apache.spark.rdd.RDD[(String, Int)] = MapPartitionsRDD[3] at map at <console>:25
+
+scala> mapdata.collect;
+res1: Array[(String, Int)] = Array((hello,1), (how,1), (are,1), (you,1), (sakshi,1), (nevya,1), (vijaya,1))
+
+scala> val reducedata=mapdata.reduceByKey(_+_);
+reducedata: org.apache.spark.rdd.RDD[(String, Int)] = ShuffledRDD[4] at reduceByKey at <console>:25
+
+scala> reducedata.collect;
+res2: Array[(String, Int)] = Array((are,1), (how,1), (hello,1), (vijaya,1), (you,1), (nevya,1), (sakshi,1))
+
+scala> :quit
+bmsce@bmsce-OptiPlex-3060:~$ cat >file1.txt
+hello hii how are you
+hello vijaya how ryt you
+hello ryt you
+^C
+bmsce@bmsce-OptiPlex-3060:~$ spark-shell
+23/06/08 12:01:24 WARN Utils: Your hostname, bmsce-OptiPlex-3060 resolves to a loopback address: 127.0.1.1; using 10.124.7.99 instead (on interface enp1s0)
+23/06/08 12:01:24 WARN Utils: Set SPARK_LOCAL_IP if you need to bind to another address
+23/06/08 12:01:29 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Using Spark's default log4j profile: org/apache/spark/log4j-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+Spark context Web UI available at http://10.124.7.99:4040
+Spark context available as 'sc' (master = local[*], app id = local-1686205892909).
+Spark session available as 'spark'.
+Welcome to
+      ____              __
+     / __/__  ___ _____/ /__
+    _\ \/ _ \/ _ `/ __/  '_/
+   /___/ .__/\_,_/_/ /_/\_\   version 2.4.8
+      /_/
+         
+Using Scala version 2.11.12 (OpenJDK 64-Bit Server VM, Java 1.8.0_362)
+Type in expressions to have them evaluated.
+Type :help for more information.
+
+scala> val data=sc.textfile("file1.txt")
+<console>:24: error: value textfile is not a member of org.apache.spark.SparkContext
+       val data=sc.textfile("file1.txt")
+                   ^
+
+scala> val data=sc.textFile("file1.txt")
+data: org.apache.spark.rdd.RDD[String] = file1.txt MapPartitionsRDD[1] at textFile at <console>:24
+
+scala> data.collect;
+res0: Array[String] = Array(hello hii how are you, hello vijaya how ryt you, hello ryt you)
+
+scala> val splitdata=data.flatMap(line=>line.split(" "));
+splitdata: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[2] at flatMap at <console>:25
+
+scala> splitdata.collect;
+res1: Array[String] = Array(hello, hii, how, are, you, hello, vijaya, how, ryt, you, hello, ryt, you)
+
+scala> val mapdata=splitdata.map(word=>(word,1));
+mapdata: org.apache.spark.rdd.RDD[(String, Int)] = MapPartitionsRDD[3] at map at <console>:25
+
+scala> mapdata.collect;
+res2: Array[(String, Int)] = Array((hello,1), (hii,1), (how,1), (are,1), (you,1), (hello,1), (vijaya,1), (how,1), (ryt,1), (you,1), (hello,1), (ryt,1), (you,1))
+
+scala> val reducedata=mapdata.reduceByKey(_+_);
+reducedata: org.apache.spark.rdd.RDD[(String, Int)] = ShuffledRDD[4] at reduceByKey at <console>:25
+
+scala> reducedata.collect;
+res3: Array[(String, Int)] = Array((are,1), (how,2), (hii,1), (hello,3), (vijaya,1), (you,3), (ryt,2))
+
+scala> val textFile=sc.textFile("file1.txt")
+textFile: org.apache.spark.rdd.RDD[String] = file1.txt MapPartitionsRDD[6] at textFile at <console>:24
+
+scala> val counts=textFile.flatMap(line=>split(" ")).map(word=>(word,1)).reduceByKey(_+_)
+<console>:25: error: not enough arguments for method split: (str: org.apache.spark.sql.Column, pattern: String)org.apache.spark.sql.Column.
+Unspecified value parameter pattern.
+       val counts=textFile.flatMap(line=>split(" ")).map(word=>(word,1)).reduceByKey(_+_)
+                                              ^
+
+scala> val counts=textFile.flatMap(line=>line.split(" ")).map(word=>(word,1)).reduceByKey(_+_)
+counts: org.apache.spark.rdd.RDD[(String, Int)] = ShuffledRDD[9] at reduceByKey at <console>:25
+
+scala> import scala.collection.immutable.ListMap
+import scala.collection.immutable.ListMap
+
+scala> val sorted=ListMap(counts.collect.sortWith(_._2 > _._2):_*)
+sorted: scala.collection.immutable.ListMap[String,Int] = Map(hello -> 3, you -> 3, how -> 2, ryt -> 2, are -> 1, hii -> 1, vijaya -> 1)
+
+scala> println(sorted)
+Map(hello -> 3, you -> 3, how -> 2, ryt -> 2, are -> 1, hii -> 1, vijaya -> 1)
+
+scala> for((k,v)<-sorted)
+     | {
+     | if(v>4)
+     | {
+     | print(k+",")
+     | print(v)
+     | println()
+     | }
+     | {
+     | 
+     | }
+     | }
+
+scala> for((k,v)<-sorted)
+     | {
+     | if(v>4)
+     | {
+     | print(k+",")
+     | print(v)
+     | println()
+     | }
+     | }
+
+scala> for((k,v)<-sorted)
+     | {
+     | if(v>2)
+     | {
+     | print(k+",")
+     | print(v)
+     | println()
+     | }
+     | }
+hello,3
+you,3
+
+scala> 
+
+
